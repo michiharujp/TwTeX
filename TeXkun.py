@@ -23,10 +23,17 @@ def tweet_image(url, message, target_id):
         print("Unable to download image")
 
 
+
+def url_encode(url):
+    url = url.replace('+', '%2B')
+    url = url.replace('&', '%26')
+    return url
+
+
 replied = [1]
 
 while 1:
-    for tweet in tweepy.Cursor(api.search, q='#showtex').items(3):
+    for tweet in tweepy.Cursor(api.search, q='#showtex').items(5):
         message = "This is TeX image\n"
         try:
             print('-----------------------------------')
@@ -36,15 +43,16 @@ while 1:
             indexF = tweet.text.find(r'$', indexS)
             formula = tweet.text[indexS: indexF]
             if tweet.id not in replied:
-                url = r"http://chart.apis.google.com/chart?cht=tx&chl=" + formula
+                url = r"http://chart.apis.google.com/chart?cht=tx&chl=" + url_encode(formula)
 
                 message = '@' + tweet.user.screen_name + '\n' + message
                 tweet_image(url, message, tweet.id)
                 replied.append(tweet.id)
                 print replied
+
         except tweepy.TweepError as e:
             print(e.reason)
 
         except StopIteration:
             break
-    sleep(15)
+    sleep(30)
